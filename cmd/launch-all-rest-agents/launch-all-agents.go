@@ -17,10 +17,10 @@ func main() {
 
 	clAgts := make([]restclientagent.RestClientAgent, 0, n)
 	servAgt := restserveragent.NewRestServerAgent(url1)
-	log.Println("démarrage du serveur...")
+	log.Println("Démarrage du serveur...")
 	go servAgt.Start()
 
-	log.Println("démarrage des clients...")
+	log.Println("Démarrage des clients...")
 	for i := 0; i < n; i++ {
 		id := fmt.Sprintf("id%02d", i)
 		myChoice := make([]vtypes.Alternative, n)
@@ -37,7 +37,7 @@ func main() {
 	}
 
 	for _, agt := range clAgts {
-		// attention, obligation de passer par cette lambda pour faire capturer la valeur de l'itération par la goroutine
+		// Attention, obligation de passer par cette lambda pour faire capturer la valeur de l'itération par la goroutine
 		func(agt restclientagent.RestClientAgent) {
 			go agt.Start()
 		}(agt)
