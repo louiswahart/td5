@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	const nbrAgts = 5
-	const nbrAlts = 3
+	const nbrAgts = 10
+	const nbrAlts = 5
 	const url1 = ":8080"
 	const url2 = "http://localhost:8080"
 
@@ -43,8 +43,8 @@ func main() {
 	for i := 0; i < nbrAgts; i++ {
 		prefs := make([]vtypes.Alternative, nbrAlts)
 		a := make([]int, nbrAlts)
-		for i := range a {
-			a[i] = i + 1
+		for j := range a {
+			a[j] = j + 1
 		}
 		rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] })
 		for j := 0; j < nbrAlts; j++ {
