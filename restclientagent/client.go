@@ -157,9 +157,9 @@ func (rca *VoteRestClientAgent) Start() {
 	err := rca.doRequest()
 
 	if err != nil {
-		log.Fatal(rca.id, "error:", err.Error())
+		log.Fatal(rca.id, "error :", err.Error())
 	} else {
-		log.Printf(rca.id, " a voté : ", rca.prefs)
+		log.Printf("%s - a voté : %v", rca.id, rca.prefs)
 	}
 }
 
@@ -170,6 +170,6 @@ func (rca *ResultRestClientAgent) Start() {
 	if err != nil {
 		log.Fatal(rca.id, "error:", err.Error())
 	} else {
-		log.Printf(rca.id, "Gagnant du ballot ", rca.ballotID, " : ", winner, " - ranking : ", ranking)
+		log.Printf("%s - Gagnant du ballot (id : %s) : %d - ranking : %v", rca.id, rca.ballotID, winner, ranking)
 	}
 }

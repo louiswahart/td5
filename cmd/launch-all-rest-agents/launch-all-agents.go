@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
+	"strconv"
 	"td5/restclientagent"
 	"td5/restserveragent"
 	"td5/vtypes"
@@ -11,8 +13,18 @@ import (
 )
 
 func main() {
-	const nbrAgts = 10
-	const nbrAlts = 5
+	if len(os.Args) != 4 {
+		fmt.Println("Veuillez respecter la syntaxe demandée")
+		return
+	}
+	nbrAgts, err1 := strconv.Atoi(os.Args[1])
+	nbrAlts, err2 := strconv.Atoi(os.Args[2])
+	if err1 != nil || err2 != nil {
+		fmt.Println(err1)
+		fmt.Println(err2)
+		return
+	}
+	rule := os.Args[3]
 	const url1 = ":8080"
 	const url2 = "http://localhost:8080"
 
@@ -31,11 +43,10 @@ func main() {
 
 	// Démarrage du NewBallotAgent
 	var c chan string = make(chan string)
-	newBallotAgt := restclientagent.NewNewBallotRestClientAgent("id00", url2, c, "kemeny", time.Now().Add(5*time.Minute), voterIDs, nbrAlts)
+	newBallotAgt := restclientagent.NewNewBallotRestClientAgent("id00", url2, c, rule, time.Now().Add(5*time.Minute), voterIDs, nbrAlts)
 	go newBallotAgt.Start()
 
 	ballotID := <-c
-	log.Println("ou")
 
 	// Démarrage des VotingAgents
 
@@ -50,7 +61,11 @@ func main() {
 		for j := 0; j < nbrAlts; j++ {
 			prefs[j] = vtypes.Alternative(a[j])
 		}
-		votingAgt := restclientagent.NewVoteRestClientAgent(voterIDs[i], url2, ballotID, prefs, nil)
+		thresholds := []int{}
+		if rule == "approval" {
+			thresholds = []int{rand.Int() % nbrAlts}
+		}
+		votingAgt := restclientagent.NewVoteRestClientAgent(voterIDs[i], url2, ballotID, prefs, thresholds)
 		votingAgts = append(votingAgts, *votingAgt)
 	}
 

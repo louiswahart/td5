@@ -13,18 +13,19 @@ import (
 	"time"
 )
 
-var supportedVotingMethods []string = []string{"borda", "copeland", "majority", "stv", "kemeny"}
+var supportedVotingMethods []string = []string{"borda", "copeland", "majority", "stv", "kemeny", "approval"}
 
 type RestServerAgent struct {
 	sync.Mutex
-	id       string
-	addr     string
-	rule     string
-	deadline time.Time
-	voterIDs []string
-	nbrAlts  int
-	ballotID string
-	Ballot   vtypes.Profile
+	id         string
+	addr       string
+	rule       string
+	deadline   time.Time
+	voterIDs   []string
+	nbrAlts    int
+	ballotID   string
+	thresholds []int
+	Ballot     vtypes.Profile
 }
 
 func NewRestServerAgent(addr string) *RestServerAgent {
@@ -153,8 +154,17 @@ func (rsa *RestServerAgent) doVote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsa.Ballot = append(rsa.Ballot, req.Prefs)
+	if rsa.rule == "approval" && len(req.Options) == 0 {
+		err = errors.New("Pas de seuil fourni")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 
+	rsa.Ballot = append(rsa.Ballot, req.Prefs)
+	if len(req.Options) != 0 {
+		rsa.thresholds = append(rsa.thresholds, req.Options[0])
+	}
 	w.WriteHeader(http.StatusOK)
 
 	return
@@ -209,6 +219,8 @@ func (rsa *RestServerAgent) doResult(w http.ResponseWriter, r *http.Request) {
 		break
 	case "kemeny":
 		count, err = comsoc.KemenySWF(rsa.Ballot)
+	case "approval":
+		count, err = comsoc.ApprovalSWF(rsa.Ballot, rsa.thresholds)
 	default:
 		err = errors.New("Procédure de vote non implémentée")
 		w.WriteHeader(http.StatusNotImplemented)
