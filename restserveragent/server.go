@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var supportedVotingMethods []string = []string{"borda", "copeland", "majority", "stv"}
+var supportedVotingMethods []string = []string{"borda", "copeland", "majority", "stv", "kemeny"}
 
 type RestServerAgent struct {
 	sync.Mutex
@@ -207,6 +207,8 @@ func (rsa *RestServerAgent) doResult(w http.ResponseWriter, r *http.Request) {
 	case "stv":
 		count, err = comsoc.StvSWF(rsa.Ballot)
 		break
+	case "kemeny":
+		count, err = comsoc.KemenySWF(rsa.Ballot)
 	default:
 		err = errors.New("Procédure de vote non implémentée")
 		w.WriteHeader(http.StatusNotImplemented)

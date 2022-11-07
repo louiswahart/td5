@@ -31,7 +31,7 @@ func main() {
 
 	// Démarrage du NewBallotAgent
 	var c chan string = make(chan string)
-	newBallotAgt := restclientagent.NewNewBallotRestClientAgent("id00", url2, c, "majority", time.Now().Add(5*time.Minute), voterIDs, nbrAlts)
+	newBallotAgt := restclientagent.NewNewBallotRestClientAgent("id00", url2, c, "kemeny", time.Now().Add(5*time.Minute), voterIDs, nbrAlts)
 	go newBallotAgt.Start()
 
 	ballotID := <-c
